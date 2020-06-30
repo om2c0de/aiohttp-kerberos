@@ -1,11 +1,17 @@
 import logging
+import sys
 from contextvars import ContextVar
-
-import kerberos
-from aiohttp import web
 from functools import wraps
-from socket import gethostname
 from os import environ
+from socket import gethostname
+
+from aiohttp import web
+
+# Import platform dependent requirements
+if sys.platform == 'win32':
+    import kerberos_sspi as kerberos
+else:
+    import kerberos
 
 
 logger = logging.getLogger(__name__)

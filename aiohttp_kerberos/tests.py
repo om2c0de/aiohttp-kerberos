@@ -101,7 +101,7 @@ class BasicAppTestCase(unittest.TestCase):
         state = object()
         init.return_value = (kerberos.AUTH_GSS_COMPLETE, state)
         step.side_effect = kerberos.GSSError("FAILURE")
-        aiohttp_kerberos.auth.init_kerberos(self.app, 'HTTP', 'example.org')
+        aiohttp_kerberos.auth.init_kerberos('HTTP', 'example.org')
         client = await aiohttp_client(self.app)
         response = await client.get('/', headers={'Authorization': 'Negotiate CTOKEN'})
         self.assertEqual(response.status_code, 403)
@@ -110,6 +110,11 @@ class BasicAppTestCase(unittest.TestCase):
         self.assertEqual(name.mock_calls, [])
         self.assertEqual(response.mock_calls, [])
         self.assertEqual(clean.mock_calls, [mock.call(state)])
+
+    def test_obtain_auth_header(self):
+        krb = aiohttp_kerberos.auth.KerberosTicket('HTTP@example.org')
+        headers = {"Authorization": krb.auth_header}
+        print(headers)
 
 
 if __name__ == '__main__':
