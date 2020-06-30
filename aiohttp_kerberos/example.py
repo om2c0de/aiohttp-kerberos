@@ -14,4 +14,4 @@ app.add_routes([web.get('/', handle)])
 
 if __name__ == '__main__':
     init_kerberos()
-    web.run_app(app, port=9099)
+    web.run_app(app, host='127.0.0.1', port=9099)
