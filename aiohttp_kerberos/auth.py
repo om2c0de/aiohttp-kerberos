@@ -117,7 +117,7 @@ def login_required(function):
                 response = await function(kerberos_user, *args, **kwargs)
                 kerberos_token = _kerberos_token.get()
                 if kerberos_token is not None:
-                    response.headers['WWW-Authenticate'] = ' '.join(['negotiate', _kerberos_token])
+                    response.headers['WWW-Authenticate'] = ' '.join(['negotiate', kerberos_token])
                 logger.debug(f'Kerberos: response headers are {response.headers}')
                 return response
             elif result != kerberos.AUTH_GSS_CONTINUE:
