@@ -10,8 +10,10 @@ from aiohttp import web
 # Import platform dependent requirements
 if sys.platform == 'win32':
     import kerberos_sspi as kerberos
+    from pywintypes import error as pywintypes_error
 else:
     import kerberos
+    pywintypes_error = OSError
 
 
 # Initialize logger
@@ -80,8 +82,7 @@ def _gssapi_authenticate(token):
             return kerberos.AUTH_GSS_CONTINUE
         else:
             return None
-    except (kerberos.GSSError, OSError) as e:
-        logger.debug(f'Kerberos: {e}')
+    except (kerberos.GSSError, pywintypes_error):
         return None
     finally:
         if state:
