@@ -108,8 +108,10 @@ def login_required(function):
             token = ''.join(header.split()[1:])
             result = _gssapi_authenticate(token)
             if result == kerberos.AUTH_GSS_COMPLETE:
-                response = await function(_kerberos_user, *args, **kwargs)
-                if _kerberos_token is not None:
+                kerberos_user = _kerberos_user.get()
+                response = await function(kerberos_user, *args, **kwargs)
+                kerberos_token = _kerberos_token.get()
+                if kerberos_token is not None:
                     response.headers['WWW-Authenticate'] = ' '.join(['negotiate', _kerberos_token])
                 return response
             elif result != kerberos.AUTH_GSS_CONTINUE:
