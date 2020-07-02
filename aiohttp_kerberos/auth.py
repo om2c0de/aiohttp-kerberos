@@ -14,7 +14,9 @@ else:
     import kerberos
 
 
+# Initialize logger
 logger = logging.getLogger(__name__)
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 
 _service_name = ...
@@ -64,9 +66,11 @@ def _gssapi_authenticate(token):
     """
     state = None
     try:
+        logger.debug(f'Kerberos: service name is {_service_name}')
         result, state = kerberos.authGSSServerInit(_service_name)
         if result != kerberos.AUTH_GSS_COMPLETE:
             return None
+        logger.debug(f'Kerberos: state is {state}')
         result = kerberos.authGSSServerStep(state, token)
         if result == kerberos.AUTH_GSS_COMPLETE:
             _kerberos_token.set(kerberos.authGSSServerResponse(state))
@@ -76,7 +80,8 @@ def _gssapi_authenticate(token):
             return kerberos.AUTH_GSS_CONTINUE
         else:
             return None
-    except kerberos.GSSError:
+    except (kerberos.GSSError, OSError) as e:
+        logger.debug(f'Kerberos: {e}')
         return None
     finally:
         if state:
