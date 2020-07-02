@@ -7,12 +7,15 @@ from socket import gethostname
 
 from aiohttp import web
 
-# Import platform dependent requirements
+# Import platform dependent kerberos requirements and exceptions
 if sys.platform == 'win32':
     import kerberos_sspi as kerberos
-    from pywintypes import error as pywintypes_error
+    import pywintypes
+
+    pywintypes_error = pywintypes.error
 else:
     import kerberos
+
     pywintypes_error = OSError
 
 
@@ -106,6 +109,7 @@ def login_required(function):
 
         header = request.headers.get("Authorization")
         if header:
+            logger.debug(f'Kerberos: Authorization header is {header}')
             token = ''.join(header.split()[1:])
             result = _gssapi_authenticate(token)
             if result == kerberos.AUTH_GSS_COMPLETE:
@@ -114,6 +118,7 @@ def login_required(function):
                 kerberos_token = _kerberos_token.get()
                 if kerberos_token is not None:
                     response.headers['WWW-Authenticate'] = ' '.join(['negotiate', _kerberos_token])
+                logger.debug(f'Kerberos: response headers are {response.headers}')
                 return response
             elif result != kerberos.AUTH_GSS_CONTINUE:
                 return web.HTTPForbidden(reason='Invalid authorization header')
