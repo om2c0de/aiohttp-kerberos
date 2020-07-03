@@ -110,7 +110,8 @@ def login_required(function):
         header = request.headers.get("Authorization")
         if header:
             logger.debug(f'Kerberos: Authorization header is {header}')
-            token = ''.join(header.split()[1:])
+            _, token = header.split()
+            logger.debug(f'Kerberos: token is {token}')
             result = _gssapi_authenticate(token)
             if result == kerberos.AUTH_GSS_COMPLETE:
                 kerberos_user = _kerberos_user.get()
