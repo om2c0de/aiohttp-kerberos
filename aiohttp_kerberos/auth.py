@@ -85,7 +85,8 @@ def _gssapi_authenticate(token):
             return kerberos.AUTH_GSS_CONTINUE
         else:
             return None
-    except (kerberos.GSSError, pywintypes_error):
+    except (kerberos.GSSError, pywintypes_error) as error:
+        logger.debug(f'Kerberos: {error}')
         return None
     finally:
         if state:
