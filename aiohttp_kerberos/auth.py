@@ -56,7 +56,7 @@ def init_kerberos(service='HTTP', hostname=gethostname()):
             logger.info(f'Kerberos: server is {principal}')
 
 
-def _gssapi_authenticate(token):
+def _gssapi_authenticate(token, service_name=None):
     """
     Performs GSSAPI Negotiate Authentication
 
@@ -70,9 +70,10 @@ def _gssapi_authenticate(token):
     :rtype: int or None
     """
     state = None
+    service_name = service_name or _service_name
     try:
-        logger.debug(f'Kerberos: service name is {_service_name}')
-        result, state = kerberos.authGSSServerInit(_service_name)
+        logger.debug(f'Kerberos: service name is {service_name}')
+        result, state = kerberos.authGSSServerInit(service_name)
         if result != kerberos.AUTH_GSS_COMPLETE:
             return None
         logger.debug(f'Kerberos: state is {state}')
