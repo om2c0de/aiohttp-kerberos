@@ -13,5 +13,5 @@ app.add_routes([web.get('/', handle)])
 
 
 if __name__ == '__main__':
-    init_kerberos()
+    init_kerberos(hostname='gpnhpetest.gpndt.test')
     web.run_app(app, host='127.0.0.1', port=8099)
