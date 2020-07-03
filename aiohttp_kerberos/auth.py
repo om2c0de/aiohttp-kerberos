@@ -7,7 +7,7 @@ from socket import gethostname
 
 from aiohttp import web
 
-# Import platform dependent kerberos requirements and exceptions
+# Platform-specific Kerberos requirements
 if sys.platform == 'win32':
     import kerberos_sspi as kerberos
     import pywintypes
@@ -24,7 +24,10 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 
+# Kerberos context
 _service_name = ...
+
+# Request context variables
 _kerberos_user = ContextVar('kerberos_user')
 _kerberos_token = ContextVar('kerberos_token')
 
@@ -123,7 +126,7 @@ def login_required(function):
                 response = await function(kerberos_user, *args, **kwargs)
                 kerberos_token = _kerberos_token.get()
                 if kerberos_token is not None:
-                    response.headers['WWW-Authenticate'] = ' '.join(['negotiate', kerberos_token])
+                    response.headers['WWW-Authenticate'] = f'Negotiate {kerberos_token}'
                 logger.debug(f'Kerberos: response headers are {response.headers}')
                 return response
             elif result != kerberos.AUTH_GSS_CONTINUE:
