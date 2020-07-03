@@ -111,11 +111,6 @@ class BasicAppTestCase(unittest.TestCase):
         self.assertEqual(response.mock_calls, [])
         self.assertEqual(clean.mock_calls, [mock.call(state)])
 
-    def test_obtain_auth_header(self):
-        krb = aiohttp_kerberos.auth.KerberosTicket('HTTP@example.org')
-        headers = {"Authorization": krb.auth_header}
-        print(headers)
-
 
 if __name__ == '__main__':
     unittest.main()
